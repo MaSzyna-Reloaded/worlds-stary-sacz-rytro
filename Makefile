@@ -5,10 +5,11 @@
 WORLD:=stary_sacz
 # The checkouts linked into this project (make links) are given explicitly - there is no default:
 # LIBMASZYNA (libmaszyna: its addons/libmaszyna, its vendor/gnd-sfx, its demo's built
-# bin/libmaszyna), GAME (the game: its vendor/gnd-biomes and its double precision Terrain3D, built
-# by its `make terrain3d`) and WORLD_ASSETS (the world assets: what the worlds share, linked for
-# this project's editor - the game mounts their packs), e.g.
-#   make links LIBMASZYNA=<libmaszyna> GAME=<maszyna-reloaded> WORLD_ASSETS=<world-assets>
+# bin/libmaszyna), GND_BIOMES (godot-biomes: its addons/gnd_biomes), TERRAIN3D (the addons/terrain_3d
+# of a double precision Terrain3D build) and WORLD_ASSETS (the world assets: what the worlds share,
+# linked for this project's editor - the game mounts their packs), e.g.
+#   make links LIBMASZYNA=<libmaszyna> GND_BIOMES=<godot-biomes> TERRAIN3D=<terrain_3d addon> \
+#     WORLD_ASSETS=<world-assets>
 # make packs needs none of them.
 GODOT?=godot-double
 # The make variable $(1) given, else make stops saying what it is ($(2)) and how to give it
@@ -23,14 +24,15 @@ world-name:
 # The addons of the other repositories and the world assets, linked as the world assets link theirs
 links:
 	$(call require,LIBMASZYNA,the libmaszyna checkout linked into this project)
-	$(call require,GAME,the game checkout whose gnd-biomes and built Terrain3D are linked)
+	$(call require,GND_BIOMES,the godot-biomes checkout linked into this project)
+	$(call require,TERRAIN3D,the addons/terrain_3d of a double precision Terrain3D build)
 	$(call require,WORLD_ASSETS,the world assets checkout whose world_assets are linked)
 	mkdir -p addons bin
 	ln -sfn $(LIBMASZYNA)/addons/libmaszyna addons/libmaszyna
 	ln -sfn $(LIBMASZYNA)/vendor/gnd-sfx/addons/gnd_sfx addons/gnd_sfx
 	ln -sfn $(LIBMASZYNA)/demo/bin/libmaszyna bin/libmaszyna
-	ln -sfn $(GAME)/vendor/gnd-biomes/addons/gnd_biomes addons/gnd_biomes
-	ln -sfn $(GAME)/vendor/terrain3d/project/addons/terrain_3d addons/terrain_3d
+	ln -sfn $(GND_BIOMES)/addons/gnd_biomes addons/gnd_biomes
+	ln -sfn $(TERRAIN3D) addons/terrain_3d
 	ln -sfn $(WORLD_ASSETS)/world_assets world_assets
 
 editor: links
