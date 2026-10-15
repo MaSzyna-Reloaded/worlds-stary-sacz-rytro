@@ -1,0 +1,35 @@
+{
+	"assets": [
+		"common_terrain",
+		"common_facades",
+		"common_biomes"
+	],
+	"biomes": "res://world_assets/common_biomes/biomes.tscn",
+	"center": [
+		49.5283269069281,
+		20.6522126210942
+	],
+	"description": "",
+	"format": 5,
+	"frame": {
+		"epsg": 2180.0,
+		"origin": [
+			619520.0,
+			185344.0
+		],
+		"projection": "PL92"
+	},
+	"name": "stary_sacz",
+	"pck": "stary_sacz/world.pck",
+	"player_start": [
+		-2059.65846680186,
+		351.780156401549,
+		-4583.38518352713
+	],
+	"scene": "res://worlds/stary_sacz/world.scn",
+	"terrain": {
+		"assets": "res://world_assets/common_terrain/assets.res",
+		"region_size": 1024
+	},
+	"title": "Stary Sacz"
+}

@@ -1,0 +1,75 @@
+name: release
+
+# <world>.zip - worlds/<world>/ (world.pck, a pack a block) and worlds/<world>.json, unzipped into
+# the game directory - built by `make packs` and published: main's newest as the one prerelease
+# <world>-main, replaced on every push to main; a pushed tag as a release of its own, named by the
+# tag, the latest. The world's files are packed as they are by world-packer
+# (vendor/world-packer), with no libmaszyna, by the double precision Godot of libmaszyna's release
+# (its ci/fetch-godot.sh, from libmaszyna's LIBMASZYNA_REF).
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '**'
+      # main's release, made by the CI itself (a tag it makes starts no workflow anyway)
+      - '!*-main'
+  workflow_dispatch:
+
+env:
+  # the libmaszyna whose engine the packs are written by (its GODOT_VERSION, the game's)
+  LIBMASZYNA_REF: feat/world-pck
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          lfs: true
+          submodules: true
+
+      - name: Checkout libmaszyna's engine fetching
+        uses: actions/checkout@v6
+        with:
+          repository: MaSzyna-Reloaded/libmaszyna
+          ref: ${{ env.LIBMASZYNA_REF }}
+          path: libmaszyna
+          sparse-checkout: |
+            ci
+            Makefile
+          sparse-checkout-cone-mode: false
+
+      - name: Fetch the double precision Godot
+        run: |
+          libmaszyna/ci/fetch-godot.sh godot.linuxbsd.editor.double.x86_64
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Build the packs
+        id: packs
+        run: |
+          make packs GODOT=godot-double PACKS_OUT="$PWD/dist"
+          echo "world=$(make -s world-name)" >> "$GITHUB_OUTPUT"
+
+      - name: Publish the tag's release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORLD: ${{ steps.packs.outputs.world }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "dist/$WORLD.zip" --verify-tag --title "$GITHUB_REF_NAME" --latest \
+            --notes "worlds/$WORLD/ and worlds/$WORLD.json of $GITHUB_REF_NAME: unzip into the game directory."
+
+      - name: Publish main's release
+        if: github.ref_type == 'branch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORLD: ${{ steps.packs.outputs.world }}
+        run: |
+          gh release delete "$WORLD-main" --cleanup-tag --yes || true
+          gh release create "$WORLD-main" "dist/$WORLD.zip" --target "$GITHUB_SHA" --prerelease --title "$WORLD-main" \
+            --notes "worlds/$WORLD/ and worlds/$WORLD.json of main at ${GITHUB_SHA::7}: unzip into the game directory."

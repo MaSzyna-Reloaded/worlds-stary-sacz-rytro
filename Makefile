@@ -1,0 +1,46 @@
+# The world stary_sacz: its sources in worlds/<WORLD>/, where the game's packs have them, and its
+# description worlds/<WORLD>.json - written by the scenery importer (this repository in its sources
+# folder), viewed in this Godot project, packed by world-packer (vendor/world-packer).
+
+WORLD:=stary_sacz
+LIBMASZYNA?=$(abspath ../../libmaszyna)
+GAME?=$(abspath ../../maszyna-reloaded)
+# what the worlds share: the world assets' sources, linked for this project's editor (the game
+# mounts their packs)
+WORLD_ASSETS?=$(abspath ../../world-assets)
+GODOT?=godot-double
+
+.PHONY: links editor packs world-name
+
+# The world's name, for the CI's release
+world-name:
+	@echo $(WORLD)
+
+# The addons of the other repositories and the world assets, linked as the world assets link theirs
+links:
+	mkdir -p addons bin
+	ln -sfn $(LIBMASZYNA)/addons/libmaszyna addons/libmaszyna
+	ln -sfn $(LIBMASZYNA)/vendor/gnd-sfx/addons/gnd_sfx addons/gnd_sfx
+	ln -sfn $(LIBMASZYNA)/demo/bin/libmaszyna bin/libmaszyna
+	ln -sfn $(GAME)/vendor/gnd-biomes/addons/gnd_biomes addons/gnd_biomes
+	ln -sfn $(GAME)/vendor/terrain3d/project/addons/terrain_3d addons/terrain_3d
+	ln -sfn $(WORLD_ASSETS)/world_assets world_assets
+
+editor: links
+	$(GODOT) --path . --editor
+
+# <WORLD>.zip - worlds/<WORLD>/ (world.pck, a pack a block) and worlds/<WORLD>.json, unzipped into
+# the game directory - built headless in a project of its own, PACKS_PROJECT: no libmaszyna, only
+# world-packer and worlds/ linked; the world's files are packed as they are, nothing imported.
+# Hidden (a dot), this project's editor does not see it. The CI's release
+# (.github/workflows/release.yml) is this.
+PACKS_PROJECT:=.packs
+PACKS_OUT?=$(PACKS_PROJECT)/out
+packs:
+	mkdir -p $(PACKS_PROJECT)/addons $(PACKS_OUT)
+	printf '%s\n' 'config_version=5' '' '[application]' '' 'config/name="MaSzyna world packs"' \
+		'config/features=PackedStringArray("4.7", "Double Precision")' '' > $(PACKS_PROJECT)/project.godot
+	ln -sfn ../worlds $(PACKS_PROJECT)/worlds
+	ln -sfn ../../vendor/world-packer/addons/world_packer $(PACKS_PROJECT)/addons/world_packer
+	$(GODOT) --headless --path $(PACKS_PROJECT) -s res://addons/world_packer/export_world.gd -- $(WORLD) $(abspath $(PACKS_OUT))
+	cd $(PACKS_OUT) && rm -f $(WORLD).zip && zip -r $(WORLD).zip worlds/$(WORLD) worlds/$(WORLD).json
