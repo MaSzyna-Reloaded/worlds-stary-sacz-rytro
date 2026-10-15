@@ -3,11 +3,11 @@
 # folder), viewed in this Godot project, packed by world-packer (vendor/world-packer).
 
 WORLD:=stary_sacz
-LIBMASZYNA?=$(abspath ../../libmaszyna)
-GAME?=$(abspath ../../maszyna-reloaded)
+LIBMASZYNA?=$(abspath ../libmaszyna)
+GAME?=$(abspath ../maszyna-reloaded)
 # what the worlds share: the world assets' sources, linked for this project's editor (the game
 # mounts their packs)
-WORLD_ASSETS?=$(abspath ../../world-assets)
+WORLD_ASSETS?=$(abspath ../world-assets)
 GODOT?=godot-double
 
 .PHONY: links editor packs world-name
