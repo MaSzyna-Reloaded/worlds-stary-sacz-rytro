@@ -3,12 +3,16 @@
 # folder), viewed in this Godot project, packed by world-packer (vendor/world-packer).
 
 WORLD:=stary_sacz
-LIBMASZYNA?=$(abspath ../libmaszyna)
-GAME?=$(abspath ../maszyna-reloaded)
-# what the worlds share: the world assets' sources, linked for this project's editor (the game
-# mounts their packs)
-WORLD_ASSETS?=$(abspath ../world-assets)
+# The checkouts linked into this project (make links) are given explicitly - there is no default:
+# LIBMASZYNA (libmaszyna: its addons/libmaszyna, its vendor/gnd-sfx, its demo's built
+# bin/libmaszyna), GAME (the game: its vendor/gnd-biomes and its double precision Terrain3D, built
+# by its `make terrain3d`) and WORLD_ASSETS (the world assets: what the worlds share, linked for
+# this project's editor - the game mounts their packs), e.g.
+#   make links LIBMASZYNA=<libmaszyna> GAME=<maszyna-reloaded> WORLD_ASSETS=<world-assets>
+# make packs needs none of them.
 GODOT?=godot-double
+# The make variable $(1) given, else make stops saying what it is ($(2)) and how to give it
+require=$(if $($(1)),,$(error $(1) not given: $(2) - make $@ $(1)=<path>))
 
 .PHONY: links editor packs world-name
 
@@ -18,6 +22,9 @@ world-name:
 
 # The addons of the other repositories and the world assets, linked as the world assets link theirs
 links:
+	$(call require,LIBMASZYNA,the libmaszyna checkout linked into this project)
+	$(call require,GAME,the game checkout whose gnd-biomes and built Terrain3D are linked)
+	$(call require,WORLD_ASSETS,the world assets checkout whose world_assets are linked)
 	mkdir -p addons bin
 	ln -sfn $(LIBMASZYNA)/addons/libmaszyna addons/libmaszyna
 	ln -sfn $(LIBMASZYNA)/vendor/gnd-sfx/addons/gnd_sfx addons/gnd_sfx
