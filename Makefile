@@ -1,6 +1,7 @@
-# The world stary_sacz: its sources in worlds/<WORLD>/, where the game's packs have them, and its
-# description worlds/<WORLD>.json - written by the scenery importer (this repository in its sources
-# folder), viewed in this Godot project, packed by world-packer (vendor/world-packer).
+# The world stary_sacz: its sources in worlds/<WORLD>/, where the game's packs have them, its metadata
+# worlds/<WORLD>/description.tres (world-packer's WorldDescription) - written by the scenery importer
+# (this repository in its sources folder), viewed in this Godot project, packed by world-packer
+# (vendor/world-packer), which makes the game's worlds/<WORLD>.json of the metadata.
 
 WORLD:=stary_sacz
 # The checkouts linked into this project (make links) are given explicitly - there is no default:

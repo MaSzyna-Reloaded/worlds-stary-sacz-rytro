@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="WorldDescription" format=3]
+
+[ext_resource type="Script" path="res://addons/world_packer/world_description.gd" id="1_ej4r6"]
+
+[resource]
+script = ExtResource("1_ej4r6")
+title = "Stary Sacz"
+projection = "PL92"
+epsg = 2180
+origin = Vector2(619520, 185344)
+center = Vector2(49.5283269069281, 20.6522126210942)
+player_start = Vector3(-2059.65846680186, 351.780156401549, -4583.38518352713)
+assets = PackedStringArray("common_terrain", "common_facades", "common_biomes")
